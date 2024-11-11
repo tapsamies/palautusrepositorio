@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "poetry-web"
+version = "0.1.0"
+description = ""
+authors = ["Joonas Tapio <joonas.tapio@helsinki.fi>"]
+readme = "README.md"
+packages = [{include = "poetry_web"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+[tool.poetry.group.dev.dependencies]
+Flask = "^3.0.3"
+pytest = "^8.3.3"
+jsonpickle = "2.2.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
