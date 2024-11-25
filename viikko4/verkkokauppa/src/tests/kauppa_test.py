@@ -10,10 +10,9 @@ class TestKauppa(unittest.TestCase):
 
     def setUp(self):
         self.pankki_mock = Mock()
-        self.viitegeneraattori_mock = Mock()
+        self.viitegeneraattori_mock = Mock(wraps=Viitegeneraattori())
 
         # palautetaan aina arvo 42
-        self.viitegeneraattori_mock.uusi.return_value = 42
 
         self.varasto_mock = Mock()
 
@@ -52,7 +51,7 @@ class TestKauppa(unittest.TestCase):
 
         # varmistetaan, että metodia tilisiirto on kutsuttu
         self.pankki_mock.tilisiirto.assert_called_with(
-            "pekka", 42, "12345", "33333-44455", 5
+            "pekka", ANY, "12345", "33333-44455", 5
         )
 
     def test_laitetaan_kaksi_eri_riittoisaa_tuotetta(self):
@@ -62,7 +61,7 @@ class TestKauppa(unittest.TestCase):
         self.kauppa.tilimaksu("antsa", "54321")
 
         self.pankki_mock.tilisiirto.assert_called_with(
-            "antsa", 42, "54321", "33333-44455", 8
+            "antsa", ANY, "54321", "33333-44455", 8
         )
 
     def test_laitetaan_kaksi_samaa_riittoisaa_tuotetta(self):
@@ -71,7 +70,7 @@ class TestKauppa(unittest.TestCase):
         self.kauppa.lisaa_koriin(1)
         self.kauppa.tilimaksu("jarppa", "33333")
         self.pankki_mock.tilisiirto.assert_called_with(
-            "jarppa", 42, "33333", "33333-44455", 10
+            "jarppa", ANY, "33333", "33333-44455", 10
         )
 
     def test_ostetaan_olevaa_ja_olematonta(self):
@@ -80,5 +79,26 @@ class TestKauppa(unittest.TestCase):
         self.kauppa.lisaa_koriin(3)
         self.kauppa.tilimaksu("juhani", "123123")
         self.pankki_mock.tilisiirto.assert_called_with(
-            "juhani", 42, "123123", "33333-44455", 5
+            "juhani", ANY, "123123", "33333-44455", 5
+        )
+
+    def test_aloita_asiointi_toimii(self):
+        self.kauppa.aloita_asiointi()
+        self.kauppa.tilimaksu("juhani", "123123")
+        self.pankki_mock.tilisiirto.assert_called_with(ANY, ANY, ANY, ANY, 0)
+
+    def test_viite_toimii(self):
+        self.kauppa.aloita_asiointi()
+        self.kauppa.lisaa_koriin(1)
+        self.kauppa.lisaa_koriin(3)
+        self.kauppa.tilimaksu("juhani", "123123")
+        self.pankki_mock.tilisiirto.assert_called_with(
+            "juhani", ANY, "123123", "33333-44455", 5
+        )
+        self.kauppa.aloita_asiointi()
+        self.kauppa.lisaa_koriin(1)
+        self.kauppa.lisaa_koriin(3)
+        self.kauppa.tilimaksu("jani", "123123")
+        self.pankki_mock.tilisiirto.assert_called_with(
+            "jani", 3, "123123", "33333-44455", 5
         )
