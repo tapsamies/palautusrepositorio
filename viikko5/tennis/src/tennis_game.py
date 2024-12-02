@@ -4,6 +4,7 @@ class TennisGame:
         self.player2_name = player2_name
         self.m_score1 = 0
         self.m_score2 = 0
+        self.score_names = ["Love", "Fifteen", "Thirty", "Forty"]
 
     def won_point(self, player_name):
         if player_name == self.player1_name:
@@ -16,14 +17,8 @@ class TennisGame:
         temp_score = 0
 
         if self.m_score1 == self.m_score2:
-            if self.m_score1 == 0:
-                score = "Love-All"
-            elif self.m_score1 == 1:
-                score = "Fifteen-All"
-            elif self.m_score1 == 2:
-                score = "Thirty-All"
-            else:
-                score = "Deuce"
+            score = self.tasapisteet()
+
         elif self.m_score1 >= 4 or self.m_score2 >= 4:
             minus_result = self.m_score1 - self.m_score2
 
@@ -53,3 +48,9 @@ class TennisGame:
                     score = score + "Forty"
 
         return score
+
+    def tasapisteet(self):
+        if self.m_score1 < 3:
+            return f"{self.score_names[self.m_score1]}-All"
+        else:
+            return "Deuce"
